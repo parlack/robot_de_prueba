@@ -4,9 +4,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -15,6 +16,29 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 public class Robot extends TimedRobot {
 
+
+  //control
+
+  int KControl=0;
+  int Intakecontrol=1;
+
+  Joystick controlprin=new Joystick(KControl);
+  Joystick intakecon=new Joystick(Intakecontrol);
+
+  double direccionY;
+
+  double valorJoys;
+
+
+          
+        double RT;
+        double LT;
+
+      //botones
+      boolean botonA;
+      boolean botonB;
+      boolean botonY;
+      boolean botonX;
 
   //Intake
   int motorintakeport=6;
@@ -26,9 +50,15 @@ public class Robot extends TimedRobot {
 
 
 
+
+
 DoubleSolenoid pistonintk = new DoubleSolenoid(sole11, sole12);
 
+//piston velocidad
 
+int sole21;
+int sole22;
+DoubleSolenoid pistonveloc=new DoubleSolenoid(sole21, sole22);
 
   //TODO PA LOS MOTORES del chasis
   int chasmotizqport1=0;
@@ -63,7 +93,9 @@ DoubleSolenoid pistonintk = new DoubleSolenoid(sole11, sole12);
 
 
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+
+  }
 
   @Override
   public void robotPeriodic() {
@@ -83,11 +115,17 @@ DoubleSolenoid pistonintk = new DoubleSolenoid(sole11, sole12);
   @Override
   public void autonomousPeriodic() {
 
+    double time=Timer.getFPGATimestamp();
 
-    chass1.arcadeDrive(0.25, 0);
+if (time<3){
+
+  chass1.arcadeDrive(0.25, 0);
 
 
+}else{
 
+chass1.arcadeDrive(0, 0);
+}
     
 
   }
@@ -102,6 +140,43 @@ DoubleSolenoid pistonintk = new DoubleSolenoid(sole11, sole12);
 
   @Override
   public void teleopPeriodic() {
+
+    botonA=intakecon.getRawButton(0);
+    botonB=intakecon.getRawButton(1);
+    botonY=controlprin.getRawButton(3);
+    botonX=controlprin.getRawButton(2);
+
+    RT=controlprin.getRawAxis(2);
+    LT=controlprin.getRawAxis(3);
+    valorJoys=controlprin.getRawAxis(0);
+    direccionY=RT-LT;
+
+    chass1.arcadeDrive(direccionY, valorJoys);
+
+
+if(botonA==true){
+pistonintk.set(Value.kForward);
+motorintake.set(0.4);
+}
+
+if(botonB==true){
+  pistonintk.set(Value.kReverse);
+  motorintake.set(0);
+  }
+
+if(botonX==true){
+pistonveloc.set(Value.kReverse);
+
+}
+
+if(botonY==true){
+  pistonveloc.set(Value.kForward);
+
+
+}
+
+
+
 
 
 
